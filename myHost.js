@@ -5,12 +5,8 @@ module.exports=function(app){
         for(interface in interfaces){
             let currentInterface=interfaces[interface];
             for(let current of currentInterface){
-                console.log("-------------------------")
-                console.log(current);
                 if(!current.internal && current.family=="IPv4"){
-
                     if(( current.netmask.match(/255/g) || []).length==3){
-                        console.log(current.address+":3030")
                         res.send(current.address+":3030");
                     }
                 }

@@ -9,6 +9,20 @@ export class App extends React.Component{
             address:""
         }
         fetch("/address").then(r => r.text()).then( address =>this.setState({address}));
+
+        let socket=io();
+        socket.emit("hola");
+        socket.on("bienvenida",(args)=>{
+            console.log(args);
+            let audioContext=new AudioContext();
+            let oscillator=audioContext.createOscillator();
+            oscillator.frequency.value=args.frecuencia;
+            oscillator.connect(audioContext.destination);
+            oscillator.start();
+            oscilator.stop(audioContext.currentTime+2);
+            
+
+        })
     }
 
     render(){
