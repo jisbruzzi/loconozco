@@ -1,9 +1,7 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
 //export class App extends React.Component
-
 let audioStreamPromise=navigator.mediaDevices.getUserMedia({audio: true, video:false})
-
 export class App extends React.Component{
 
     constructor(props){
@@ -21,7 +19,7 @@ export class App extends React.Component{
             console.log(args);
             let audioContext=new AudioContext();
             let oscillator=audioContext.createOscillator();
-            oscillator.frequency.value=args.frecuencia;
+            oscillator.frequency.setValueAtTime(args.frecuencia,audioContext.currentTime+1);
             oscillator.connect(audioContext.destination);
             oscillator.start();
             oscillator.stop(audioContext.currentTime+2);
@@ -41,10 +39,53 @@ export class App extends React.Component{
     }
 
     componentDidMount(){
+
+        function promediosPorVentana(datos,cantidad){
+
+            let ret=[];
+            for(let b=0;b<cantidad;b++){
+                
+                let semiLargo=Math.floor(datos.length/cantidad);
+                let suma=0;
+                let q=0;
+                for(let i=b*semiLargo;i<(b+1)*semiLargo;i++){
+                    suma+=0.0+datos[i];
+                    q++;
+                }
+                ret.push(suma/q);
+            }
+            return ret;
+        }
+
+        function desviacionesPorVentana(datos,cantidad){
+
+            let ret=[];
+            for(let b=0;b<cantidad;b++){
+                
+                let semiLargo=Math.floor(datos.length/cantidad);
+                let suma=0;
+                let q=0;
+                for(let i=b*semiLargo;i<(b+1)*semiLargo;i++){
+                    suma+=0.0+datos[i];
+                    q++;
+                }
+                let promedio = suma/q;
+
+                let sumaDifs=0;
+                for(let i=b*semiLargo;i<(b+1)*semiLargo;i++){
+                    sumaDifs+=(datos[i]-promedio)*(datos[i]-promedio);
+                }
+
+                ret.push(Math.sqrt(sumaDifs/q));
+                
+            }
+            return ret;
+        }
+
         let canvas=document.getElementById("canvas");
         let ctx=canvas.getContext("2d");
         let dataArray = null;
-        ctx.strokeStyle="black";
+        
         ctx.fillStyle="blue";
         let f = (t)=>{
             window.requestAnimationFrame(f)
@@ -56,6 +97,7 @@ export class App extends React.Component{
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
             ctx.fillRect(0,0,300,300);
+            ctx.strokeStyle="black";
             ctx.beginPath();
             ctx.moveTo(0,300);
             //dataArray=[0,0.5,0.3];
@@ -64,6 +106,23 @@ export class App extends React.Component{
             }
             ctx.stroke();
 
+            ctx.strokeStyle="red";
+            ctx.beginPath();
+            ctx.moveTo(0,300);
+            let promedios=promediosPorVentana(dataArray,20)
+            for(let i=0;i<promedios.length;i++){
+                ctx.lineTo(i/promedios.length*300,300-promedios[i]/256*300);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle="green";
+            ctx.beginPath();
+            ctx.moveTo(0,300);
+            let desviaciones=desviacionesPorVentana(dataArray,20)
+            for(let i=0;i<desviaciones.length;i++){
+                ctx.lineTo(i/desviaciones.length*300,300-(promedios[i]+2.5*desviaciones[i])/256*300);
+            }
+            ctx.stroke();
             
         };
         window.requestAnimationFrame(f);
