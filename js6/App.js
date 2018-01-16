@@ -5,8 +5,12 @@ let audioStreamPromise=navigator.mediaDevices.getUserMedia({audio: true, video:f
 export class App extends React.Component{
 
     constructor(props){
-        
         super(props);
+        this.frecuencia=0;
+        
+        
+        this.audioContext=new AudioContext();
+        
         this.analyser=null;
         this.state={
             address:""
@@ -17,12 +21,8 @@ export class App extends React.Component{
         socket.emit("hola");
         socket.on("bienvenida",(args)=>{
             console.log(args);
-            let audioContext=new AudioContext();
-            let oscillator=audioContext.createOscillator();
-            oscillator.frequency.setValueAtTime(args.frecuencia,audioContext.currentTime+1);
-            oscillator.connect(audioContext.destination);
-            oscillator.start();
-            oscillator.stop(audioContext.currentTime+2);
+            this.frecuencia=args.frecuencia;
+            
         })
 
         audioStreamPromise.then((stream)=>{
@@ -128,10 +128,34 @@ export class App extends React.Component{
         window.requestAnimationFrame(f);
     }
 
+    mouseDown(){
+        console.log("DOWMM")
+        this.oscillator=this.audioContext.createOscillator();
+        this.oscillator.frequency.setValueAtTime(this.frecuencia,this.audioContext.currentTime);
+        this.oscillator.connect(this.audioContext.destination);
+        this.oscillator.start();
+    }
+    mouseUp(){
+        console.log("UP")
+        this.oscillator.stop(this.audioContext.currentTime);
+    }
+
     render(){
         return <span>
             <span>hola, conectate entrando a {this.state.address}</span>
             <canvas id="canvas" width="300" height="300"></canvas>
+            <button
+                onTouchStart={this.mouseDown.bind(this)}
+                onTouchEnd={this.mouseUp.bind(this)}
+                onTouchCancel={this.mouseUp.bind(this)}
+                onMouseDown={this.mouseDown.bind(this)} 
+                onMouseUp={this.mouseUp.bind(this)}
+                style={{
+                    width:40,
+                    height:40
+                }}
+
+            ></button>
         </span>
     }
     
