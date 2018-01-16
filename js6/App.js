@@ -7,6 +7,7 @@ export class App extends React.Component{
     constructor(props){
         super(props);
         this.frecuencia=0;
+        this.frecuenciasEscucho=[];
         
         
         this.audioContext=new AudioContext();
@@ -22,7 +23,6 @@ export class App extends React.Component{
         socket.on("bienvenida",(args)=>{
             console.log(args);
             this.frecuencia=args.frecuencia;
-            
         })
 
         audioStreamPromise.then((stream)=>{
@@ -35,6 +35,12 @@ export class App extends React.Component{
             this.analyser=analyser;
             
             
+        })
+
+        socket.on("cambios",(args)=>{
+            console.log("LOS JUGADORES QUE TENGO SON:")
+            console.log(args);
+            this.frecuenciasEscucho=args.map((o)=>o.frecuencia);
         })
     }
 
@@ -101,6 +107,69 @@ export class App extends React.Component{
             ctx.beginPath();
             ctx.moveTo(0,300);
             //dataArray=[0,0.5,0.3];
+
+            //---------------chequear las frecuencias
+            for(let frecuenciaBusco of this.frecuenciasEscucho){
+                let banda=Math.ceil(frecuenciaBusco/this.audioContext.sampleRate*this.analyser.fftSize);
+                let valor=dataArray[banda];
+
+                let valorCoeficiente=(new Array(100))
+                    .map((v,i,a)=>Math.floor(i-a.length/2))//de -20 a 20
+                    .filter((v)=>v!=0)//sin 0
+                    .map( v => [v+banda,v/(a.length/2)])//de banda-20 a banda+20, de -1 a 1
+                    .map( v => [v[0],1/Math.sqrt(2*Math.PI)*Math.exp(-0.5*v[1]*v[1])])//agrego la distribución en el segundo item
+                    .filter((v)=>v[0]>=0 && v[0]<dataArray.length)//filtro los externos
+                    .map((v)=>[dataArray[v[0]],v[1]]);//agrego el valor en el primer item
+                
+                let sumaCoeficientes=valorCoeficiente
+                    .map((v)=>v[1])
+                    .reduce((a,b)=>a+b,0);
+                
+                let promedioPonderado=valorCoeficiente
+                    .map((v)=>v[0]*v[1]/sumaCoeficientes)
+                    .reduce((a,b)=>a+b,0);
+
+                
+                
+                if(valor>1.5*promedioPonderado && valor>20){
+                    console.log("Escucho a este!!",frecuenciaBusco);
+                    console.log(valor,promedioPonderado);
+                }
+                
+                
+
+                /*
+                let promedioCircundante=0;
+                let qt=0;
+                for(let i=0;i<40;i++){
+                    let bandaPromediar = banda+i-20;
+                    if(bandaPromediar>=0){
+                        promedioCircundante+=dataArray[bandaPromediar];
+                        qt+=1;
+                    }
+                }
+                promedioCircundante/=qt;
+                
+
+                if(valor>promedioCircundante*1.5){
+                    console.log("Escucho a este!!",frecuenciaBusco);
+                }
+                */
+                
+
+            }
+
+            
+
+
+
+
+
+
+
+            //-----------------listo lo de chequear las frecuencias
+
+            
             for(let i=0;i<dataArray.length;i++){
                 ctx.lineTo(i/dataArray.length*300,300-dataArray[i]/256*300);
             }

@@ -27,13 +27,22 @@ io.on("connection",function(socket){
     let frecuencia=Math.random()*10000;
     socket.emit("bienvenida",{secreto,frecuencia})
     descriptores[secreto]={frecuencia};
+    enviarCambios(socket);
 
     console.log(descriptores);
     socket.on("disconnect",()=>{
         //descriptores[secreto]=undefined;
         delete descriptores[secreto];
         console.log(descriptores);
+        enviarCambios(socket);
     })
 })
+
+function enviarCambios(socket){
+    socket.broadcast.emit(
+        "cambios",
+        Object.keys(descriptores).map((k)=>descriptores[k])
+    )
+}
 
 require("./myHost")(app)
