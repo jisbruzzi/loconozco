@@ -5,6 +5,8 @@ import {BotonPulso} from "./BotonPulso.js"
 import {Oyente} from "./Oyente.js"
 import {CambiaVolumen} from "./CambiaVolumen.js"
 
+import {IngresaNombre} from "./IngresaNombre.js"
+
 export class App extends React.Component{
 
     constructor(props){
@@ -12,7 +14,8 @@ export class App extends React.Component{
         this.state={
             frecuencia:0,
             frecuenciasEscucho:[],
-            volumen:0.1
+            volumen:0.1,
+            nombre:""
         }
         
         this.analyser=null;
@@ -35,12 +38,24 @@ export class App extends React.Component{
         this.setState({volumen:nuevo})
     }
 
+    nuevoNombre(nombre){
+        this.setState({nombre:nombre})
+    }
+
     render(){
-        return <span>
-            <Instrucciones/>
+        let preNombre=<IngresaNombre callback={this.nuevoNombre.bind(this)}/>
+        let postNombre=<span>
+            
             <Oyente frecuenciasEscucho={this.state.frecuenciasEscucho}/>
-            <BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
+            
             <CambiaVolumen volumen={this.state.volumen} callback={this.cambiaVolumen.bind(this)}/>
+        
+        </span>
+
+        //<BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
+
+        return <span>
+            {this.state.nombre===""?preNombre:postNombre}
         </span>
     }
     

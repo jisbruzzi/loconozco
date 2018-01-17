@@ -11,6 +11,6 @@ export class Instrucciones extends React.Component{
     }
 
     render(){
-        return <span>hola, conectate entrando a {this.state.address}</span>
+        return <span>hola, conectate entrando a https://{this.state.address}</span>
     }
 }
