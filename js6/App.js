@@ -47,12 +47,12 @@ export class App extends React.Component{
         let postNombre=<span>
             
             <Oyente frecuenciasEscucho={this.state.frecuenciasEscucho}/>
-            
+            <BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
             <CambiaVolumen volumen={this.state.volumen} callback={this.cambiaVolumen.bind(this)}/>
         
         </span>
 
-        //<BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
+        
 
         return <span>
             {this.state.nombre===""?preNombre:postNombre}
