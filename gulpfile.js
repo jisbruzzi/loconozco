@@ -18,11 +18,28 @@ gulp.task("build-react", function(){
         paths: ["./js6/"]           // This allows relative imports in require, with './scripts/' as root
     };
 
-    return browserify(options)
+    var options2 = {
+        entries: "./js6/mainPantalla.js",   // Entry point
+        extensions: [".js"],            // consider files with these extensions as modules 
+        debug: argv.production ? false : true,  // add resource map at the end of the file or not
+        paths: ["./js6/"]           // This allows relative imports in require, with './scripts/' as root
+    };
+
+    return Promise.all([
+        browserify(options)
         .transform(babelify)
         .bundle()
         .pipe(source("main.min.js"))
         .pipe(gulpif(argv.production, buffer()))    // Stream files
         .pipe(gulpif(argv.production, uglify()))
-        .pipe(gulp.dest("./js"));
+        .pipe(gulp.dest("./js")),
+
+        browserify(options2)
+        .transform(babelify)
+        .bundle()
+        .pipe(source("mainPantalla.min.js"))
+        .pipe(gulpif(argv.production, buffer()))    // Stream files
+        .pipe(gulpif(argv.production, uglify()))
+        .pipe(gulp.dest("./js"))
+    ]) 
 });

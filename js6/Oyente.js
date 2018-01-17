@@ -4,12 +4,14 @@ import {Graficador} from "./Grafico.js"
 import {EscuchaFrecuencia} from "./EscuchaFrecuencia.js"
 
 
-let audioStreamPromise=navigator.mediaDevices.getUserMedia({audio: true, video:false})
 
 export class Oyente extends React.Component{
     constructor(props){
         super(props);
+        
+        
         audioStreamPromise.then((stream)=>{
+            console.log("OIGO!")
             let audioContext=new AudioContext();
             this.audioContext=audioContext;
             let source=audioContext.createMediaStreamSource(stream);
@@ -17,10 +19,16 @@ export class Oyente extends React.Component{
             source.connect(analyser);
             analyser.fftSize = 2048;
             this.analyser=analyser;
+        }).catch((e)=>{
+            console.log("HUBO UN ERROR");
+            console.log(Object.keys(e))
+            console.log(e);
+            this.setState({error:e})
         })
 
         this.state={
-            dataArray:[]
+            dataArray:[],
+            error:{}
         }
     }
 
@@ -30,16 +38,15 @@ export class Oyente extends React.Component{
         let f = (t)=>{
 
             if(this.analyser==null) {
-                window.requestAnimationFrame(f)
                 return;
             }
 
             if(dataArray==null) dataArray=new Uint8Array(this.analyser.frequencyBinCount);
             this.analyser.getByteFrequencyData(dataArray);
             this.setState({dataArray});
-            window.requestAnimationFrame(f)
+            console.log("Acá actualizando dataArray!!")
         }
-        window.requestAnimationFrame(f);
+        window.setInterval(f,100);
     }
 
     render(){
@@ -55,12 +62,15 @@ export class Oyente extends React.Component{
                 />
             )
         }
-        
-
         return <span>
-            <canvas id="canvas" width="300" height="300"></canvas>
-            <Graficador datos={this.state.dataArray}/>
+            
             <ul>{escuchados}</ul>
+            {this.props.frecuenciasEscucho}
+            porque {escuchados.length}
+            y porque {this.props.frecuenciasEscucho.length}
+            y ademas {this.state.dataArray.length}
+            Y el error es {this.state.error.toString()} {Object.keys(this.state.error)} {Object.keys(this.state.error).length}
         </span>
+        
     }
 }
