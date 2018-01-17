@@ -3,15 +3,17 @@ import React from 'react';
 import {Instrucciones} from "./Instrucciones.js"
 import {BotonPulso} from "./BotonPulso.js"
 import {Oyente} from "./Oyente.js"
+import {CambiaVolumen} from "./CambiaVolumen.js"
 
 export class App extends React.Component{
 
     constructor(props){
         super(props);
         this.state={
-            frecuencia:0
+            frecuencia:0,
+            frecuenciasEscucho:[],
+            volumen:0.1
         }
-        this.frecuenciasEscucho=[];
         
         this.analyser=null;
         
@@ -25,15 +27,20 @@ export class App extends React.Component{
         socket.on("cambios",(args)=>{
             console.log("LOS JUGADORES QUE TENGO SON:")
             console.log(args);
-            this.frecuenciasEscucho=args.map((o)=>o.frecuencia);
+            this.setState({frecuenciasEscucho:args.map((o)=>o.frecuencia)});
         })
+    }
+
+    cambiaVolumen(nuevo){
+        this.setState({volumen:nuevo})
     }
 
     render(){
         return <span>
             <Instrucciones/>
-            <Oyente/>
-            <BotonPulso frecuencia={this.state.frecuencia}/>
+            <Oyente frecuenciasEscucho={this.state.frecuenciasEscucho}/>
+            <BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
+            <CambiaVolumen volumen={this.state.volumen} callback={this.cambiaVolumen.bind(this)}/>
         </span>
     }
     

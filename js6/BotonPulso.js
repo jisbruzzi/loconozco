@@ -9,9 +9,16 @@ export class BotonPulso extends React.Component{
 
     mouseDown(){
         console.log("DOWMM")
+        this.gainNode=this.oscillator=this.audioContext.createGain();
+        this.gainNode.gain.value=this.props.volumen;
+
+
         this.oscillator=this.audioContext.createOscillator();
         this.oscillator.frequency.setValueAtTime(this.props.frecuencia,this.audioContext.currentTime);
-        this.oscillator.connect(this.audioContext.destination);
+
+        this.oscillator.connect(this.gainNode);
+        this.gainNode.connect(this.audioContext.destination);
+
         this.oscillator.start();
     }
     mouseUp(){

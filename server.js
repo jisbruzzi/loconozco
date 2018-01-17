@@ -24,7 +24,7 @@ io.on("connection",function(socket){
     console.log("SE CONECTO ALGIUEN WTF");
     
     let secreto=Math.random();
-    let frecuencia=Math.random()*10000;
+    let frecuencia=Math.random()*3000+5000;
     socket.emit("bienvenida",{secreto,frecuencia})
     descriptores[secreto]={frecuencia};
     enviarCambios(socket);
@@ -40,6 +40,10 @@ io.on("connection",function(socket){
 
 function enviarCambios(socket){
     socket.broadcast.emit(
+        "cambios",
+        Object.keys(descriptores).map((k)=>descriptores[k])
+    )
+    socket.emit(
         "cambios",
         Object.keys(descriptores).map((k)=>descriptores[k])
     )
