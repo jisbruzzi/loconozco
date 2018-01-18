@@ -34,8 +34,8 @@ export class BotonPulso extends React.Component{
                 onMouseDown={this.mouseDown.bind(this)} 
                 onMouseUp={this.mouseUp.bind(this)}
                 style={{
-                    width:40,
-                    height:40
+                    width:"100%",
+                    height:"30vw"
                 }}
 
             ></button>

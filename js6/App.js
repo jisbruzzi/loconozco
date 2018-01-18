@@ -13,24 +13,25 @@ export class App extends React.Component{
         super(props);
         this.state={
             frecuencia:0,
-            frecuenciasEscucho:[],
+            jugadores:[],
             volumen:0.1,
             nombre:""
         }
         
         this.analyser=null;
         
-        let socket=io();
-        socket.emit("hola");
-        socket.on("bienvenida",(args)=>{
+        this.socket=io();
+
+        
+        this.socket.on("bienvenida",(args)=>{
             console.log(args);
             this.setState({frecuencia:args.frecuencia});
         })
 
-        socket.on("cambios",(args)=>{
+        this.socket.on("cambios",(args)=>{
             console.log("LOS JUGADORES QUE TENGO SON:")
             console.log(args);
-            this.setState({frecuenciasEscucho:args.map((o)=>o.frecuencia)});
+            this.setState({jugadores:args});
         })
     }
 
@@ -39,20 +40,28 @@ export class App extends React.Component{
     }
 
     nuevoNombre(nombre){
-        this.setState({nombre:nombre})
+        this.setState({nombre})
+        this.socket.emit("hola",{nombre});
     }
 
     render(){
         let preNombre=<IngresaNombre callback={this.nuevoNombre.bind(this)}/>
-        let postNombre=<span>
+        let postNombre=<div style={{
+            display:"flex",
+            flexDirection:"column",
+            width:"100%",
+            height:"100%",
+            overflow:"hidden"
+        }}>
             
-            <Oyente frecuenciasEscucho={this.state.frecuenciasEscucho}/>
+            <Oyente jugadores={this.state.jugadores}/>
+            <BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
             
             <CambiaVolumen volumen={this.state.volumen} callback={this.cambiaVolumen.bind(this)}/>
         
-        </span>
+        </div>
 
-        //<BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
+        //
 
         
 
