@@ -9,39 +9,31 @@ export function CambiaVolumen(props){
             props.callback(actual+q);
         }
     }
-    return <span>
-        <button
-            onClick={haceCallback(-0.01)}
-            style={{
-                width:40,
-                height:40
-            }}
+    return <div style={{
+        width:"100vw",
+        height:"25vw",
+        display:"flex",
+        flexDirection:"row",
+        justifyContent:"space-around",
+        alignItems:"center"
 
+    }}>
+        <button
+            style={{width:"20vw",height:"20vw"}}
+            onClick={haceCallback(-0.01)}
         >--</button>
         <button
+            style={{width:"20vw",height:"20vw"}}
             onClick={haceCallback(-0.001)}
-            style={{
-                width:40,
-                height:40
-            }}
-
         >-</button>
-        {actual.toFixed(3)}
+        <span>{actual.toFixed(3)}</span>
         <button
+            style={{width:"20vw",height:"20vw"}}
             onClick={haceCallback(0.001)}
-            style={{
-                width:40,
-                height:40
-            }}
-
         >+</button>
         <button
+            style={{width:"20vw",height:"20vw"}}
             onClick={haceCallback(0.01)}
-            style={{
-                width:40,
-                height:40
-            }}
-
         >++</button>
-    </span>
+    </div>
 }

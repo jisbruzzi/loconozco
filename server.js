@@ -22,17 +22,23 @@ let io=require("socket.io")(server);
 let descriptores={};
 io.on("connection",function(socket){
     console.log("SE CONECTO ALGIUEN WTF");
-    
-    let secreto=Math.random();
-    let frecuencia=Math.random()*3000+5000;
-    socket.emit("bienvenida",{secreto,frecuencia})
-    descriptores[secreto]={frecuencia};
-    enviarCambios(socket);
 
+    let nombre="";
+
+    socket.on("hola",(m)=>{
+        nombre=m.nombre;
+        console.log("Se conecto uno y me mando el hola")
+        console.log(m);
+
+        let frecuencia=Math.random()*3000+5000;
+        socket.emit("bienvenida",{nombre,frecuencia})
+        descriptores[nombre]={frecuencia};
+        enviarCambios(socket);
+    });
+    
     console.log(descriptores);
     socket.on("disconnect",()=>{
-        //descriptores[secreto]=undefined;
-        delete descriptores[secreto];
+        delete descriptores[nombre];
         console.log(descriptores);
         enviarCambios(socket);
     })
@@ -41,11 +47,15 @@ io.on("connection",function(socket){
 function enviarCambios(socket){
     socket.broadcast.emit(
         "cambios",
-        Object.keys(descriptores).map((k)=>descriptores[k])
+        Object.keys(descriptores).map((k)=>{
+            return {nombre:k,frecuencia:descriptores[k].frecuencia}
+        })
     )
     socket.emit(
         "cambios",
-        Object.keys(descriptores).map((k)=>descriptores[k])
+        Object.keys(descriptores).map((k)=>{
+            return {nombre:k,frecuencia:descriptores[k].frecuencia}
+        })
     )
 }
 
