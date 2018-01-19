@@ -28,8 +28,9 @@ export function EscuchaFrecuencia(props){
         .map((v,i,a)=>Math.floor(i-a.length/2))//de -20 a 20
     
     if(valor>1.5*promedioPonderado && valor>5){
-        return <li>Estoy escuchando a {props.nombre}</li>
+        props.callback();
+        return <li>Estoy escuchando a {props.nombre} ({props.puntaje})</li>
     }else{
-        return <li> No escucho a {props.nombre}</li>
+        return <li> No escucho a {props.nombre} ({props.puntaje})</li>
     }
 }

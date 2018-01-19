@@ -44,6 +44,12 @@ export class App extends React.Component{
         this.socket.emit("hola",{nombre});
     }
 
+    escuchaDesconocido(){
+        let yos=this.state.jugadores.filter((j)=>j.nombre===this.state.nombre)
+        let desconocido=yos[0].pareja;
+        this.socket.emit("escuchoDesconocido",desconocido)
+    }
+
     render(){
         let preNombre=<IngresaNombre callback={this.nuevoNombre.bind(this)}/>
         let postNombre=<div style={{
@@ -54,14 +60,12 @@ export class App extends React.Component{
             overflow:"hidden"
         }}>
             
-            <Oyente jugadores={this.state.jugadores} nombre={this.state.nombre}/>
+            <Oyente escuchaDesconocido={this.escuchaDesconocido.bind(this)} jugadores={this.state.jugadores} nombre={this.state.nombre}/>
             <BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
             
             <CambiaVolumen volumen={this.state.volumen} callback={this.cambiaVolumen.bind(this)}/>
         
         </div>
-
-        //
 
         
 

@@ -55,6 +55,10 @@ export class Oyente extends React.Component{
         console.log(this.props.nombre)
     }
 
+    escuchaDesconocido(){
+        this.props.escuchaDesconocido();
+    }
+
     render(){
 
         let desconocido=""
@@ -69,15 +73,23 @@ export class Oyente extends React.Component{
         }
 
         let escuchados=[];
-        if(this.state.audioContext){
-            escuchados=this.props.jugadores.map((j)=>
-                <EscuchaFrecuencia 
-                    datos={this.state.dataArray} 
-                    frecuencia={j.frecuencia}
-                    nombre={j.nombre}
-                    sampleRate={this.state.audioContext.sampleRate}
-                    fftSize={this.analyser.fftSize}
-                />
+        if(this.state.audioContext && this.analyser){
+            
+            escuchados=this.props.jugadores.map((j)=>{
+                    let callback=()=>{};
+                    if(j.nombre==desconocido){
+                        callback=this.escuchaDesconocido.bind(this);
+                    }
+                    return <EscuchaFrecuencia 
+                        callback={callback}
+                        datos={this.state.dataArray} 
+                        frecuencia={j.frecuencia}
+                        nombre={j.nombre}
+                        puntaje={j.puntaje}
+                        sampleRate={this.state.audioContext.sampleRate}
+                        fftSize={this.analyser.fftSize}
+                    />
+                }
             )
             
         }
@@ -96,6 +108,11 @@ export class Oyente extends React.Component{
 
             
         </div>
+
+        /*
+        <canvas id="canvas" width="20" height="20"></canvas>
+            <Graficador datos={this.state.dataArray}/>
+            **/
         
 
         //

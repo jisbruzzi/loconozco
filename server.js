@@ -32,10 +32,42 @@ console.log(sacarCualquiera([1,2]))
 console.log(sacarCualquiera([1,2,3]))
 
 let descriptores={};
+
+
+function reasignar(){
+    console.log("REASIGNANDO")
+    let noAsignados=Object.keys(descriptores);
+    while(noAsignados.length>1){
+        console.log("NoAsignados1:",noAsignados)
+
+        let o1=sacarCualquiera(noAsignados)
+        noAsignados=o1.array;
+
+        console.log("NoAsignados2:",noAsignados)
+
+        let o2=sacarCualquiera(noAsignados)
+        noAsignados=o2.array;
+
+        console.log("NoAsignados3:",noAsignados)
+
+        descriptores[o1.e].pareja=o2.e;
+        descriptores[o2.e].pareja=o1.e;
+
+        console.log("descriptores:",descriptores)
+    }
+}
+
+let sockets=[];
+
 io.on("connection",function(socket){
     console.log("SE CONECTO ALGIUEN WTF");
+    sockets.push(socket);
 
     let nombre="";
+
+    setInterval(()=>{
+        enviarCambios();
+    },5000)
 
     socket.on("hola",(m)=>{
         nombre=m.nombre;
@@ -44,43 +76,54 @@ io.on("connection",function(socket){
 
         let frecuencia=Math.random()*3000+5000;
         socket.emit("bienvenida",{nombre,frecuencia})
-        descriptores[nombre]={frecuencia,puntaje:0,pareja:null};
-        enviarCambios(socket);
+        descriptores[nombre]={frecuencia,puntaje:0,pareja:null,escuchaDesconocido:0};
+        enviarCambios();
     });
 
     socket.on("pantalla",(m)=>{
-        enviarCambios(socket);
+        enviarCambios();
     })
 
     socket.on("empezar",(m)=>{
         console.log("Empiezo")
-        let noAsignados=Object.keys(descriptores);
-        while(noAsignados.length>1){
-            console.log("NoAsignados1:",noAsignados)
+        reasignar();
+        enviarCambios();
+    })
 
-            let o1=sacarCualquiera(noAsignados)
-            noAsignados=o1.array;
 
-            console.log("NoAsignados2:",noAsignados)
+    socket.on("escuchoDesconocido",(m)=>{
+        if(! descriptores[nombre]) return;
 
-            let o2=sacarCualquiera(noAsignados)
-            noAsignados=o2.array;
+        let desconocido=descriptores[nombre].pareja;
+        if(!descriptores[desconocido]) return;
 
-            console.log("NoAsignados3:",noAsignados)
+        
+        if(descriptores[nombre].pareja===m){
+            console.log(nombre," escucha a su desconocido!")
+            descriptores[nombre].escuchaDesconocido=Date.now();
+            let diferencia = descriptores[nombre].escuchaDesconocido - descriptores[m].escuchaDesconocido;
+            if(diferencia<500){
+                descriptores[nombre].puntaje+=1;
+                descriptores[m].puntaje+=1;
+                for(let n in descriptores){
+                    descriptores[n].pareja="nadie";
+                }
+                enviarCambios();
 
-            descriptores[o1.e].pareja=o2.e;
-            descriptores[o2.e].pareja=o1.e;
-
-            console.log("descriptores:",descriptores)
+                setTimeout(()=>{
+                    reasignar();
+                    enviarCambios();
+                },3000)
+                
+            }
         }
-        enviarCambios(socket);
     })
     
     console.log(descriptores);
     socket.on("disconnect",()=>{
         delete descriptores[nombre];
         console.log(descriptores);
-        enviarCambios(socket);
+        enviarCambios();
     })
 })
 
@@ -94,15 +137,13 @@ function enviarCambios(socket){
         }
     })
 
-    socket.broadcast.emit(
-        "cambios",
-        cambios
-    )
-    socket.emit(
-        "cambios",
-        cambios
-    )
+    for(let s of sockets){
+        s.emit(
+            "cambios",
+            cambios
+        )
 
+    }
     console.log("envie los cambios",cambios)
 }
 

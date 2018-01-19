@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom';
 import React from 'react';
 
 let audioStreamPromise=navigator.mediaDevices.getUserMedia({audio: true, video:false})
-
+const TAMANIO_GRAFICO=20
 export function Graficador(props){
 
         function promediosPorVentana(datos,cantidad){
@@ -59,32 +59,32 @@ export function Graficador(props){
             
             ctx.clearRect(0,0,canvas.width,canvas.height);
             
-            ctx.fillRect(0,0,300,300);
+            ctx.fillRect(0,0,TAMANIO_GRAFICO,TAMANIO_GRAFICO);
             ctx.strokeStyle="black";
             ctx.beginPath();
-            ctx.moveTo(0,300);
+            ctx.moveTo(0,TAMANIO_GRAFICO);
 
             
             for(let i=0;i<dataArray.length;i++){
-                ctx.lineTo(i/dataArray.length*300,300-dataArray[i]/256*300);
+                ctx.lineTo(i/dataArray.length*TAMANIO_GRAFICO,TAMANIO_GRAFICO-dataArray[i]/256*TAMANIO_GRAFICO);
             }
             ctx.stroke();
 
             ctx.strokeStyle="red";
             ctx.beginPath();
-            ctx.moveTo(0,300);
+            ctx.moveTo(0,TAMANIO_GRAFICO);
             let promedios=promediosPorVentana(dataArray,20)
             for(let i=0;i<promedios.length;i++){
-                ctx.lineTo(i/promedios.length*300,300-promedios[i]/256*300);
+                ctx.lineTo(i/promedios.length*TAMANIO_GRAFICO,TAMANIO_GRAFICO-promedios[i]/256*TAMANIO_GRAFICO);
             }
             ctx.stroke();
 
             ctx.strokeStyle="green";
             ctx.beginPath();
-            ctx.moveTo(0,300);
+            ctx.moveTo(0,TAMANIO_GRAFICO);
             let desviaciones=desviacionesPorVentana(dataArray,20)
             for(let i=0;i<desviaciones.length;i++){
-                ctx.lineTo(i/desviaciones.length*300,300-(promedios[i]+2.5*desviaciones[i])/256*300);
+                ctx.lineTo(i/desviaciones.length*TAMANIO_GRAFICO,TAMANIO_GRAFICO-(promedios[i]+2.5*desviaciones[i])/256*TAMANIO_GRAFICO);
             }
             ctx.stroke();
 
