@@ -46,18 +46,30 @@ export class Oyente extends React.Component{
             if(dataArray==null) dataArray=new Uint8Array(this.analyser.frequencyBinCount);
             this.analyser.getByteFrequencyData(dataArray);
             this.setState({dataArray});
-            console.log("Acá actualizando dataArray!!")
         }
         window.setInterval(f,100);
+
+        console.log("LOs jugadores son:")
+        console.log(this.props.jugadores)
+        console.log("vos sos")
+        console.log(this.props.nombre)
     }
 
     render(){
 
+        let desconocido=""
+
+        let miNombre=this.props.jugadores.filter(j=>j.nombre===this.props.nombre);
+        if(miNombre.length>0){
+            desconocido=miNombre[0].pareja;
+        }
+
+        if(desconocido==null){
+            desconocido="";
+        }
+
         let escuchados=[];
-        console.log(this.props.jugadores)
-        console.log(this.state.audioContext)
         if(this.state.audioContext){
-            console.log("Hago los escuchados")
             escuchados=this.props.jugadores.map((j)=>
                 <EscuchaFrecuencia 
                     datos={this.state.dataArray} 
@@ -70,7 +82,6 @@ export class Oyente extends React.Component{
             
         }
 
-        console.log(escuchados)
 
         return <div style={{
             width:"100vw",
@@ -78,7 +89,16 @@ export class Oyente extends React.Component{
         }}>
             
             <ul>{escuchados}</ul>
+            {desconocido!==""?
+                <span>tu desconocido es :{desconocido}</span>:
+                <span></span>
+            }
+
+            
         </div>
+        
+
+        //
         
     }
 }

@@ -54,7 +54,7 @@ export class App extends React.Component{
             overflow:"hidden"
         }}>
             
-            <Oyente jugadores={this.state.jugadores}/>
+            <Oyente jugadores={this.state.jugadores} nombre={this.state.nombre}/>
             <BotonPulso frecuencia={this.state.frecuencia} volumen={this.state.volumen}/>
             
             <CambiaVolumen volumen={this.state.volumen} callback={this.cambiaVolumen.bind(this)}/>
